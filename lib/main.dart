@@ -96,14 +96,27 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(
             height: 30.0,
           ),
-          SizedBox(
-            width: double.infinity,
-            child: RawMaterialButton(
-              fillColor: const Color(0xff0069fe),
-              onPressed: () {},
-              child: const Text("Login"),
-            ),
-          ),
+          Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                    50.0), // Atur nilai sesuai kebutuhan Anda
+              ),
+              child: RawMaterialButton(
+                fillColor: Colors.blue,
+                onPressed: () {},
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                      15.0), // Sesuaikan nilai ini sesuai kebutuhan Anda
+                ),
+                child: const Text(
+                  "Login",
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              )),
         ],
       ),
     );
