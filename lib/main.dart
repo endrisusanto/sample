@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: "Email",
                 prefixIcon: Icon(
                   Icons.mail,
-                  color: Colors.black,
+                  color: Colors.grey,
                 )),
           ),
           //input field password
@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: "Password",
                 prefixIcon: Icon(
                   Icons.lock,
-                  color: Colors.black,
+                  color: Colors.grey,
                 )),
           ),
           //link lupa password
