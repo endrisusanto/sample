@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,10 +27,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //initial firebase app
+  Future<FirebaseApp> _initializeFirebase() async {
+    FirebaseApp firebaseApp = await Firebase.initializeApp();
+    return firebaseApp;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: LoginScreen(),
+    return Scaffold(
+      body: FutureBuilder(
+        future: _initializeFirebase(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return const LoginScreen();
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }
@@ -41,8 +60,34 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+//LOGIN FUNCTION
+  //LOGIN FUNCTION
+  static Future<User?> loginUsingEmailPassword(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user;
+    try {
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      user = userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "user-not-found") {
+        print("no user found for that email");
+      }
+      // Handle other FirebaseAuthExceptions here if needed
+    } catch (e) {
+      // Handle other exceptions here if needed
+    }
+    return user;
+  }
+
   @override
   Widget build(BuildContext context) {
+    //CREATE TEXT FIELD CONTROLLER
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -62,26 +107,28 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(
             height: 44.0,
           ),
-          const TextField(
+          TextField(
+            controller: emailController,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 hintText: "Email",
                 prefixIcon: Icon(
                   Icons.mail,
-                  color: Colors.black,
+                  color: Colors.grey,
                 )),
           ),
           //input field password
           const SizedBox(
             height: 44.0,
           ),
-          const TextField(
+          TextField(
+            controller: passwordController,
             obscureText: true,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 hintText: "Password",
                 prefixIcon: Icon(
                   Icons.lock,
-                  color: Colors.black,
+                  color: Colors.grey,
                 )),
           ),
           //link lupa password
@@ -104,13 +151,26 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: RawMaterialButton(
                 fillColor: Colors.blue,
-                onPressed: () {},
+                elevation: 0.0,
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                onPressed: () async {
+                  User? user = await loginUsingEmailPassword(
+                    email: emailController.text,
+                    password: passwordController.text,
+                    context: context,
+                  );
+                  print(user);
+                  if (user != null) {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => const ProfileScreen()));
+                  }
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(
                       15.0), // Sesuaikan nilai ini sesuai kebutuhan Anda
                 ),
                 child: const Text(
-                  "Login",
+                  "LOGIN",
                   style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
